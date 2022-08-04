@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  selector:
+      app: web
+  ports:
+    - protocol: TCP
+      port: 80
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sitemap-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: "200Mi"
+  volumeMode: Filesystem
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  selector:
+    matchLabels:
+      app: web
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: web
+        image: ghcr.io/canastawiki/canasta:1.1.1
+        resources: {}
+        ports:
+        - containerPort: 80
+        env:
+        - name: MW_SITE_SERVER
+          value: http://canastacli.tk
+        - name: PHP_UPLOAD_MAX_FILESIZE
+          value: "10M"
+        - name: PHP_POST_MAX_SIZE
+          value: "10M"
+        - name: PHP_MAX_INPUT_VARS
+          value: "1000"
+        - name: MW_SITEMAP_SUBDIR
+          value: ""
+        - name: MW_SITEMAP_IDENTIFIER
+          value: ""
+        volumeMounts:
+        - mountPath: /var/www/mediawiki/w/extensions
+          name: config-volume
+          subPath: ./extensions
+        - mountPath: /var/www/mediawiki/w/skins
+          name: config-volume
+          subPath: ./skins
+        - mountPath: /mediawiki/config
+          name: config-volume
+          subPath: ./config
+        - mountPath: /mediawiki/images
+          name: config-volume
+          subPath: ./images
+        - name: sitemap-data
+          mountPath: /mediawiki/sitemap
+      volumes:
+          - name: config-volume
+            hostPath:
+              path: /canasta/config-data
+              type: Directory
+          - name: sitemap-data
+            persistentVolumeClaim:
+              claimName: sitemap-data
