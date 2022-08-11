@@ -50,7 +50,7 @@ spec:
             valueFrom:
               configMapKeyRef:
                 name: canasta-env
-                key: MYSQL_ROOT_PASSWORD
+                key: MYSQL_PASSWORD
           - name: MYSQL_DATABASE
             value: "mediawiki"
         ports:

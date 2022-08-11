@@ -1,23 +1,30 @@
 # Canasta-Kubernetes
 Kubernetes stack template for Canasta
 
-Note: Currently the secrets are default and hardcoded into the yaml files
-
 How to get started
 
 Make sure you have a Kuberentes cluster ready and Kubectl works
 
-Apply the init-job
-
-After it is completed apply the remaining files to get a Canasta Kuberenetes deployment ready.
+Make necessary changes to the files in the config and settings directory and the .env file
 
 ```
-kubectl apply -f init-job.yaml
-kubectl apply -f db.yaml,web.yaml,varnish.yaml,caddy.yaml
+./start.sh
 ```
 
-How it works
+OR
 
-Currently the config files are saved on the Kubernetes Node and shared with the pods using hostPath, which is not preferred for production but allows easy management of the different files and 3rd party extensions/skins.
+1. Create configmaps canasta-env from .env file, canasta-config from config/, canasta-settings from settings/
+2. Start all the manifest files under Kubernetes/
 
-Init job clones the required files to the folder /canasta/config-data and they are served to different pods. This could be skiped if you already have the required config files in the /canasta/config-data folder on your node.
+```
+kubectl create configmap canasta-settings --from-file=./settings/
+kubectl create configmap canasta-config --from-file=./config/
+kubectl create configmap canasta-env --from-env-file=.env
+
+kubectl apply -f Kubernetes/
+```
+
+
+
+Current Issues:
+VisualEditor works during the first deployment. But after redeploying them, VisualEditor seems to have issues connecting to the Parsoid/RESTBase server.
