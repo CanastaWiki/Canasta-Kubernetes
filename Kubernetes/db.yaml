@@ -47,7 +47,10 @@ spec:
           - name: MYSQL_ROOT_HOST
             value: "%"
           - name: MYSQL_ROOT_PASSWORD
-            value: "mediawiki"
+            valueFrom:
+              configMapKeyRef:
+                name: canasta-env
+                key: MYSQL_ROOT_PASSWORD
           - name: MYSQL_DATABASE
             value: "mediawiki"
         ports:
@@ -57,17 +60,20 @@ spec:
           mountPath: /docker-entrypoint-initdb.d
         - name: my-cnf-config
           mountPath: /etc/my.cnf
+          subPath: my.cnf
         - name: mysql-data
           mountPath: /var/lib/mysql
       volumes:
       - name: initdb-volume
         hostPath:
           path: /canasta/config-data/_initdb
-          type: Directory
+          type: DirectoryOrCreate
       - name: my-cnf-config
-        hostPath:
-          path: /canasta/config-data/my.cnf
-          type: File
+        configMap:
+          name: canasta-config
+          items:
+          - key: "my.cnf"
+            path: "my.cnf"
       - name: mysql-data
         persistentVolumeClaim:
           claimName: mysql-data

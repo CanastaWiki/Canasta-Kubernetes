@@ -45,19 +45,9 @@ spec:
         resources: {}
         ports:
         - containerPort: 80
-        env:
-        - name: MW_SITE_SERVER
-          value: http://canastacli.tk
-        - name: PHP_UPLOAD_MAX_FILESIZE
-          value: "10M"
-        - name: PHP_POST_MAX_SIZE
-          value: "10M"
-        - name: PHP_MAX_INPUT_VARS
-          value: "1000"
-        - name: MW_SITEMAP_SUBDIR
-          value: ""
-        - name: MW_SITEMAP_IDENTIFIER
-          value: ""
+        envFrom:
+        - configMapRef:
+            name: canasta-env
         volumeMounts:
         - mountPath: /var/www/mediawiki/w/extensions
           name: config-volume
@@ -66,14 +56,21 @@ spec:
           name: config-volume
           subPath: ./skins
         - mountPath: /mediawiki/config
-          name: config-volume
-          subPath: ./config
+          name: canasta-config
+        - mountPath: /mediawiki/config/settings
+          name: canasta-settings
         - mountPath: /mediawiki/images
           name: config-volume
           subPath: ./images
         - name: sitemap-data
           mountPath: /mediawiki/sitemap
       volumes:
+          - name: canasta-config
+            configMap:
+              name: canasta-config
+          - name: canasta-settings
+            configMap:
+              name: canasta-settings
           - name: config-volume
             hostPath:
               path: /canasta/config-data

@@ -35,8 +35,11 @@ spec:
         volumeMounts:
           - name: default-vcl-config
             mountPath: /etc/varnish/default.vcl
+            subPath: ./default.vcl
       volumes:
           - name: default-vcl-config
-            hostPath:
-              path: /canasta/config-data/config/default.vcl
-              type: File
+            configMap:
+              name: canasta-config
+              items:
+              - key: "default.vcl"
+                path: "default.vcl"

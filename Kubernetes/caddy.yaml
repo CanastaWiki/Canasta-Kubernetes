@@ -30,10 +30,11 @@ spec:
 
 ---
 
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: caddy-deployment
+  name: caddy
 spec:
   selector:
     matchLabels:
@@ -48,11 +49,17 @@ spec:
       - name: caddy
         resources: {}
         image: caddy:2.4.6-alpine
+        env:
+        - name: MW_SITE_FQDN
+          valueFrom:
+            configMapKeyRef:
+              name: canasta-env
+              key: MW_SITE_FQDN
         command: 
         - "caddy"
         - "reverse-proxy"
         - "--from"
-        - "canastacli.tk"
+        - "$(MW_SITE_FQDN)"
         - "--to"
         - "varnish:80"
         ports:
