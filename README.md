@@ -5,7 +5,13 @@ How to get started
 
 Make sure you have a Kuberentes cluster ready and Kubectl works
 
-Make necessary changes to the files in the config and settings directory and the .env file
+Clone the repository
+
+```
+git clone https://github.com/amalpaul54111/Canasta-Kubernetes.git
+```
+
+Make necessary changes to the .env file and the files in the config and settings directory
 
 ```
 ./start.sh
@@ -23,8 +29,3 @@ kubectl create configmap canasta-env --from-env-file=.env
 
 kubectl apply -f Kubernetes/
 ```
-
-
-
-Current Issues:
-VisualEditor works during the first deployment. But after redeploying them, VisualEditor seems to have issues connecting to the Parsoid/RESTBase server.
