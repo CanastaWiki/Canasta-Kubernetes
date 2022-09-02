@@ -1,17 +1,17 @@
 # Canasta-Kubernetes
-Kubernetes stack template for Canasta
+Kubernetes stack template for Canasta.
 
-How to get started
+## Installation
 
-Make sure you have a Kuberentes cluster ready and Kubectl works
+First, make sure you have a Kubernetes cluster ready, and that Kubectl works.
 
-Clone the repository
+Then, clone the repository:
 
 ```
-git clone https://github.com/amalpaul54111/Canasta-Kubernetes.git
+git clone https://github.com/CanastaWiki/Canasta-Kubernetes
 ```
 
-Make necessary changes to the .env file and the files in the config and settings directory
+Make necessary changes to the .env file and the files in the config and settings directory, and then call the following:
 
 ```
 ./start.sh
@@ -19,13 +19,17 @@ Make necessary changes to the .env file and the files in the config and settings
 
 OR
 
-1. Create configmaps canasta-env from .env file, canasta-config from config/, canasta-settings from settings/
-2. Start all the manifest files under Kubernetes/
+Create the three necessary ConfigMaps with the following commands:
 
 ```
 kubectl create configmap canasta-settings --from-file=./settings/
 kubectl create configmap canasta-config --from-file=./config/
 kubectl create configmap canasta-env --from-env-file=.env
+```
 
+Then, run the following to start all the manifest files under the Kubernetes/ directory:
+
+
+```
 kubectl apply -f Kubernetes/
 ```
