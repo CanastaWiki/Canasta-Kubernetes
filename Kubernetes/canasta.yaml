@@ -54,7 +54,7 @@ spec:
     spec:
       containers:
       - name: web
-        image: ghcr.io/canastawiki/canasta:1.2.x-beta
+        image: ghcr.io/canastawiki/canasta:1.3.0
         resources: {}
         ports:
         - containerPort: 80
@@ -78,7 +78,7 @@ spec:
         - name: sitemap-data
           mountPath: /mediawiki/sitemap
       - name: elasticsearch
-        image: docker.elastic.co/elasticsearch/elasticsearch:6.8.23
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
         env:
         - name: discovery.type
           value: single-node
