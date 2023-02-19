@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: canasta
+spec:
+  selector:
+    app: canasta
+  ports:
+    - protocol: TCP
+      port: 80
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sitemap-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: "200Mi"
+  volumeMode: Filesystem
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: canasta
+spec:
+  selector:
+    matchLabels:
+      app: canasta
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: canasta
+    spec:
+      containers:
+      - name: web
+        image: ghcr.io/canastawiki/canasta:1.2.x-beta
+        resources: {}
+        ports:
+        - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: canasta-env
+        volumeMounts:
+        - mountPath: /var/www/mediawiki/w/user-extensions
+          name: config-volume
+          subPath: ./extensions
+        - mountPath: /var/www/mediawiki/w/user-skins
+          name: config-volume
+          subPath: ./skins
+        - mountPath: /mediawiki/config
+          name: canasta-config
+        - mountPath: /mediawiki/config/settings
+          name: canasta-settings
+        - mountPath: /mediawiki/images
+          name: config-volume
+          subPath: ./images
+        - name: sitemap-data
+          mountPath: /mediawiki/sitemap
+      volumes:
+      - name: canasta-config
+        configMap:
+          name: canasta-config
+      - name: canasta-settings
+        configMap:
+          name: canasta-settings
+      - name: config-volume
+        hostPath:
+          path: /canasta/config-data
+          type: DirectoryOrCreate
+      - name: sitemap-data
+        persistentVolumeClaim:
+          claimName: sitemap-data
+      - name: elasticsearch
+        persistentVolumeClaim:
+          claimName: elasticsearch-data
