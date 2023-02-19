@@ -16,3 +16,10 @@ Make necessary changes to the .env file and the files in the config and settings
 ```
 ./start.sh
 ```
+
+## Set up Elasticsearch
+```
+kubectl exec elasticsearch-pod-name -it -- php /var/www/mediawiki/w/canasta-extensions/CirrusSearch/maintenance/UpdateSearchIndexConfig.php \
+&& kubectl exec elasticsearch-pod-name -it -- php /var/www/mediawiki/w/canasta-extensions/CirrusSearch/maintenance/ForceSearchIndex.php --skipLinks --indexOnSkip \
+&& kubectl exec elasticsearch-pod-name -it -- php /var/www/mediawiki/w/canasta-extensions/CirrusSearch/maintenance/ForceSearchIndex.php --skipParse
+```
