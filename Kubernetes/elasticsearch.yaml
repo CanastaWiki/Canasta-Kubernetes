@@ -12,11 +12,32 @@ spec:
 
 ---
 
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: elasticsearch-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: elasticsearch
 spec:
+  selector:
+    matchLabels:
+      app: elasticsearch
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
     spec:
       containers:
       - name: elasticsearch
@@ -30,9 +51,9 @@ spec:
           value: "-Xms512m -Xmx512m"
         resources:
           limits:
-            memory: "1Gi"
+            memory: "2Gi"
           requests:
-            memory: "1Gi"
+            memory: "2Gi"
         volumeMounts:
         - name: elasticsearch
           mountPath: /usr/share/elasticsearch/data
