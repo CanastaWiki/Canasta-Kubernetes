@@ -1,0 +1,132 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: canasta
+spec:
+  selector:
+    app: canasta
+  ports:
+    - protocol: TCP
+      port: 80
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: "200Mi"
+  volumeMode: Filesystem
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sitemap-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: "200Mi"
+  volumeMode: Filesystem
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: canasta
+spec:
+  selector:
+    matchLabels:
+      app: canasta
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: canasta
+    spec:
+      containers:
+      - name: web
+        image: ghcr.io/canastawiki/canasta:1.1.1
+        resources: {}
+        ports:
+        - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: canasta-env
+        volumeMounts:
+        - mountPath: /var/www/mediawiki/w/extensions
+          name: config-volume
+          subPath: ./extensions
+        - mountPath: /var/www/mediawiki/w/skins
+          name: config-volume
+          subPath: ./skins
+        - mountPath: /mediawiki/config
+          name: canasta-config
+        - mountPath: /mediawiki/config/settings
+          name: canasta-settings
+        - mountPath: /mediawiki/images
+          name: config-volume
+          subPath: ./images
+        - name: mysql-data
+          mountPath: /var/lib/mysql
+        - name: sitemap-data
+          mountPath: /mediawiki/sitemap
+      - name: db
+        image: mysql:8.0
+        resources: {}
+        env:
+          - name: MYSQL_ROOT_HOST
+            value: "%"
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: canasta-env
+                key: MYSQL_PASSWORD
+          - name: MYSQL_DATABASE
+            value: "mediawiki"
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: initdb-volume
+          mountPath: /docker-entrypoint-initdb.d
+        - name: my-cnf-config
+          mountPath: /etc/my.cnf
+          subPath: my.cnf
+        - name: mysql-data
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: canasta-config
+        configMap:
+          name: canasta-config
+      - name: canasta-settings
+        configMap:
+          name: canasta-settings
+      - name: config-volume
+        hostPath:
+          path: /canasta/config-data
+          type: DirectoryOrCreate
+      - name: sitemap-data
+        persistentVolumeClaim:
+          claimName: sitemap-data
+      - name: initdb-volume
+        hostPath:
+          path: /canasta/config-data/_initdb
+          type: DirectoryOrCreate
+      - name: my-cnf-config
+        configMap:
+          name: canasta-config
+          items:
+          - key: "my.cnf"
+            path: "my.cnf"
+      - name: mysql-data
+        persistentVolumeClaim:
+          claimName: mysql-data
