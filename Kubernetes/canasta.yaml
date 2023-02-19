@@ -78,6 +78,3 @@ spec:
       - name: sitemap-data
         persistentVolumeClaim:
           claimName: sitemap-data
-      - name: elasticsearch
-        persistentVolumeClaim:
-          claimName: elasticsearch-data
