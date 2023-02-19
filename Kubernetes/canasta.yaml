@@ -78,7 +78,7 @@ spec:
         - name: sitemap-data
           mountPath: /mediawiki/sitemap
       - name: elasticsearch
-        image: docker.elastic.co/elasticsearch/elasticsearch:6.8.23-arm
+        image: docker.elastic.co/elasticsearch/elasticsearch:6.8.23
         env:
         - name: discovery.type
           value: single-node
