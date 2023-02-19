@@ -49,6 +49,8 @@ spec:
           value: "true"
         - name: ES_JAVA_OPTS
           value: "-Xms512m -Xmx512m"
+        ports:
+        - containerPort: 9200
         resources:
           limits:
             memory: "2Gi"
