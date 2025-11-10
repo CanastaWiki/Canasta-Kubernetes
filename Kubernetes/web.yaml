@@ -41,7 +41,7 @@ spec:
     spec:
       containers:
       - name: web
-        image: ghcr.io/canastawiki/canasta:1.1.1
+        image: ghcr.io/canastawiki/canasta:latest
         resources: {}
         ports:
         - containerPort: 80
@@ -49,14 +49,15 @@ spec:
         - configMapRef:
             name: canasta-env
         volumeMounts:
-        - mountPath: /var/www/mediawiki/w/extensions
+        - mountPath: /var/www/mediawiki/w/user-extensions
           name: config-volume
           subPath: ./extensions
-        - mountPath: /var/www/mediawiki/w/skins
+        - mountPath: /var/www/mediawiki/w/user-skins
           name: config-volume
           subPath: ./skins
         - mountPath: /mediawiki/config
           name: canasta-config
+          subPath: ./config
         - mountPath: /mediawiki/config/settings
           name: canasta-settings
         - mountPath: /mediawiki/images
