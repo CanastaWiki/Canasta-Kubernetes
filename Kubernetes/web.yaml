@@ -57,7 +57,6 @@ spec:
           subPath: ./skins
         - mountPath: /mediawiki/config
           name: canasta-config
-          subPath: ./config
         - mountPath: /mediawiki/config/settings
           name: canasta-settings
         - mountPath: /mediawiki/images
