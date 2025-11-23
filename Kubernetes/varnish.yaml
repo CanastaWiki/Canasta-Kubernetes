@@ -29,7 +29,12 @@ spec:
       - name: varnish
         image: varnish:7.0.2-alpine
         resources:
-          limits: {}
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
         ports:
         - containerPort: 80
         volumeMounts:
@@ -43,3 +48,23 @@ spec:
               items:
               - key: "default.vcl"
                 path: "default.vcl"
+---
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: varnish-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: varnish
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50

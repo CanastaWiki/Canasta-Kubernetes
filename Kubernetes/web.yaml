@@ -42,7 +42,13 @@ spec:
       containers:
       - name: web
         image: ghcr.io/canastawiki/canasta:latest
-        resources: {}
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
         ports:
         - containerPort: 80
         envFrom:
@@ -58,7 +64,7 @@ spec:
         - mountPath: /mediawiki/config
           name: canasta-config
           subPath: ./config
-        - mountPath: /mediawiki/config/settings
+        - mountPath: /mediawiki/settings
           name: canasta-settings
         - mountPath: /mediawiki/images
           name: config-volume
@@ -79,3 +85,23 @@ spec:
           - name: sitemap-data
             persistentVolumeClaim:
               claimName: sitemap-data
+---
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: web-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
