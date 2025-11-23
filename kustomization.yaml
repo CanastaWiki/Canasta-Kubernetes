@@ -18,7 +18,8 @@ configMapGenerator:
   - config/composer.local.json
   - config/default.vcl
   - config/my.cnf
-  - config/LocalSettings.php
+  # Uncomment the following line if you have a LocalSettings.php file
+  # - config/LocalSettings.php
 - name: canasta-env
   envs:
   - .env

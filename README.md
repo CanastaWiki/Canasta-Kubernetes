@@ -13,6 +13,8 @@ git clone https://github.com/CanastaWiki/Canasta-Kubernetes
 
 Make necessary changes to the `.env` file and the files in the `config` and `settings` directory.
 
+> **Note for Fresh Installations**: If you are installing Canasta for the first time, you will need to go through the MediaWiki setup UI. After the setup is complete, download the generated `LocalSettings.php`, place it in the `config/` directory, and uncomment the `LocalSettings.php` line in `kustomization.yaml`. Then, apply the changes again.
+
 ### Option 1: Manual Deployment (Kustomize)
 
 You can deploy directly using `kubectl` with Kustomize:
