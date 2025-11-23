@@ -27,7 +27,12 @@ This replaces the old `./start.sh` script.
 
 This repository is ready for ArgoCD.
 
-1. Install ArgoCD on your cluster if you haven't already.
+1. Install ArgoCD on your cluster if you haven't already:
+
+   ```bash
+   kubectl create namespace argocd
+   kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+   ```
 2. Apply the Application manifest:
 
 ```bash
