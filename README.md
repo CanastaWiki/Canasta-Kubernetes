@@ -40,3 +40,5 @@ kubectl apply -f argocd-app.yaml
 ```
 
 This will create an ArgoCD application named `canasta` that syncs this repository to the `default` namespace.
+
+For detailed instructions on accessing the UI, managing deployments, and performing upgrades, see [ArgoCD Usage Guide](ARGOCD_USAGE.md).
