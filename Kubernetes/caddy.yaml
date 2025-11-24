@@ -47,7 +47,13 @@ spec:
     spec:
       containers:
       - name: caddy
-        resources: {}
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
         image: caddy:2.4.6-alpine
         env:
         - name: MW_SITE_FQDN
@@ -74,3 +80,23 @@ spec:
         - name: caddy-data
           persistentVolumeClaim:
             claimName: caddy-data
+---
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: caddy-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: caddy
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50

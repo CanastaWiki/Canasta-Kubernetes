@@ -42,7 +42,13 @@ spec:
       containers:
       - name: db
         image: mysql:8.0
-        resources: {}
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
         env:
           - name: MYSQL_ROOT_HOST
             value: "%"
