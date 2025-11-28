@@ -9,6 +9,7 @@ resources:
 - Kubernetes/elasticsearch.yaml
 - Kubernetes/varnish.yaml
 - Kubernetes/web.yaml
+- Kubernetes/backup.yaml
 
 configMapGenerator:
 - name: canasta-settings
@@ -25,3 +26,18 @@ configMapGenerator:
 - name: canasta-env
   envs:
   - .env
+  literals:
+  - BACKUP_SCHEDULE="@daily"
+  - RESTIC_RETENTION="--keep-daily 7 --keep-weekly 4 --keep-monthly 6"
+
+replacements:
+- source:
+    kind: ConfigMap
+    name: canasta-env
+    fieldPath: data.BACKUP_SCHEDULE
+  targets:
+  - select:
+      kind: CronJob
+      name: canasta-backup
+    fieldPaths:
+    - spec.schedule
