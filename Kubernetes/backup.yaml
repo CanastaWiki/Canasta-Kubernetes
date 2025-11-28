@@ -1,0 +1,61 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: canasta-backup
+spec:
+  schedule: "@daily"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          volumes:
+            - name: backup-data
+              emptyDir: {}
+            - name: config-volume
+              hostPath:
+                path: /canasta/config-data
+                type: DirectoryOrCreate
+            - name: backup-repo
+              hostPath:
+                path: /canasta/backups
+                type: DirectoryOrCreate
+            - name: canasta-env
+              configMap:
+                name: canasta-env
+          initContainers:
+            - name: db-dump
+              image: mysql:8.0
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  mysqldump -h db -u root --password="$MYSQL_ROOT_PASSWORD" mediawiki > /backup/db.sql
+              env:
+                - name: MYSQL_ROOT_PASSWORD
+                  valueFrom:
+                    configMapKeyRef:
+                      name: canasta-env
+                      key: MYSQL_PASSWORD
+              volumeMounts:
+                - name: backup-data
+                  mountPath: /backup
+          containers:
+            - name: restic
+              image: restic/restic:latest
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  restic snapshots || restic init
+                  restic backup /backup/db.sql /canasta/images /canasta/config --host canasta-backup
+                  restic forget $RESTIC_RETENTION --prune
+              envFrom:
+                - configMapRef:
+                    name: canasta-env
+              volumeMounts:
+                - name: backup-data
+                  mountPath: /backup
+                - name: config-volume
+                  mountPath: /canasta
+                - name: backup-repo
+                  mountPath: /repo
